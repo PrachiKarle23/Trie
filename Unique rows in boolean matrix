@@ -1,0 +1,95 @@
+class TrieNode{
+    public:
+      char data;
+      TrieNode* children[9];
+      bool isTerminal;
+      TrieNode(char ch)
+      {
+          data=ch;
+          for(int i=0;i<9;i++)
+          {
+              children[i]=NULL;
+          }
+          isTerminal=false;
+      }
+};
+class Trie {
+public:
+    TrieNode* root;
+
+    Trie() {
+        root=new TrieNode('\n');
+    }
+    void insertUtil(TrieNode* root,string word){
+        if(word.length()==0){
+            root->isTerminal=true;
+            return;
+        }
+        int i=word[0]-'0';
+        TrieNode* child;
+        if(root->children[i]!=NULL){
+            child=root->children[i];
+        }
+        else{
+            child=new TrieNode(word[0]);
+            root->children[i]=child;
+        }
+        insertUtil(child,word.substr(1));
+    }
+    void insert(string word) {
+        insertUtil(root,word);
+    }
+    
+    bool searchUtil(TrieNode* root,string word)
+    {
+        if(word.length()==0){
+            return root->isTerminal;
+        }
+        
+        int ind=word[0]-'0';
+        TrieNode* child;
+        if(root->children[ind]!=NULL){
+            child=root->children[ind];
+        }
+        else{
+            return false;
+        }
+        return searchUtil(child,word.substr(1));
+    }
+    bool search(string word){
+        return searchUtil(root,word);
+    }
+};
+
+class Solution
+{
+    public:
+    vector<vector<int>> uniqueRow(int M[MAX][MAX],int row,int col)
+    {
+        Trie *t = new Trie();
+        
+        vector<vector<int>> ans;
+        
+        for(int i = 0; i < row; i++){
+            string s = "";
+            vector<int> temp;
+            for(int j = 0; j < col; j++){
+                temp.push_back(M[i][j]);
+                if( M[i][j] == 1 )
+                s += '1';
+                else
+                s += '0';
+            }
+            if( t -> search(s) )
+            {
+                continue;
+            }
+            else{
+                t -> insert(s);
+                ans.push_back(temp);
+            }
+        }
+        
+        return ans;
+    }
+};
