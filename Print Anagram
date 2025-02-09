@@ -1,0 +1,130 @@
+class TrieNode{
+    public:
+       char data;
+       TrieNode* children[26];
+       bool isTerminal;
+       TrieNode(char ch)
+       {
+           data=ch;
+           for(int i=0;i<26;i++)
+           {
+               children[i]=NULL;
+           }
+           isTerminal=false;
+       }
+};
+
+class Trie{
+    public:
+       TrieNode* root;
+       Trie()
+       {
+           root=new TrieNode('\0');
+       }
+       
+       void insertUtil(TrieNode* root,string s)
+       {
+           if(s.length()==0)
+           {
+               root->isTerminal=true;
+               return;
+           }
+           int i=s[0]-'a';
+           TrieNode* child;
+           if(root->children[i]!=NULL)
+           {
+               child=root->children[i];
+           }
+           else{
+               child=new TrieNode(s[0]);
+               root->children[i]=child;
+           }
+           insertUtil(child,s.substr(1));
+       }
+       void insert(string s){
+           insertUtil(root,s);
+       }
+       
+       
+       bool searchUtil(TrieNode* root,string s)
+       {
+           if(s.length()==0)
+           {
+               return root-> isTerminal;
+           }
+           int i=s[0]-'a';
+           TrieNode* child;
+           if(root->children[i]!=NULL)
+           {
+               child=root->children[i];
+           }
+           else{
+               return false;
+           }
+           return searchUtil(child,s.substr(1));
+       }
+       bool search(string s)
+       {
+          return searchUtil(root,s);
+       }
+};
+
+
+
+class Solution {
+  public:
+    static unordered_map<string,int>mp;
+  
+    static bool cmp(pair<string,string>& p1, pair<string,string>& p2)
+    {
+       if(p1.first==p2.first){
+         if(mp[p1.second]<mp[p2.second])
+         {
+             return p1.first<p2.first;
+         }
+         else if(mp[p1.second]>mp[p2.second]){
+             return p2.first<p1.first;
+         }
+       } 
+       return p1.first<p2.first;
+    }
+    
+    vector<vector<string>> anagrams(vector<string>& arr) {
+        
+      vector<vector<string>>ans;
+      Trie* t=new Trie();
+      
+      vector<pair<string,string>>p;
+      
+      
+      for(int i=0;i<arr.size();i++)
+      {
+          string temp=arr[i];
+          sort(temp.begin(),temp.end());
+          mp[arr[i]]=i;
+          p.push_back(make_pair(temp,arr[i]));
+      }
+      
+      sort(p.begin(),p.end(),cmp);
+      
+      
+      int j=-1;
+      for(int i=0;i<p.size();i++)
+      {
+        
+        if(t->search(p[i].first)){
+            ans[j].push_back(p[i].second);
+        }
+        else{
+            j++;
+            t->insert(p[i].first);
+            ans.push_back(vector<string>());
+            ans[j].push_back(p[i].second);
+        }
+      }
+    
+      return ans;
+    }
+};
+
+ unordered_map<string, int> Solution::mp;
